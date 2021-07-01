@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -84,11 +86,28 @@ func setInitialQueueState(queueState *tasks.Queue) {
 	if queueState.GetRateLimits().GetMaxDispatchesPerSecond() == 0 {
 		queueState.RateLimits.MaxDispatchesPerSecond = 500.0
 	}
+
+	maxDispatchesPerSecond, err := strconv.ParseFloat(os.Getenv("MAX_DISPATCHES_PER_SECOND"), 64)
+	if err == nil && maxDispatchesPerSecond != 0 {
+		queueState.RateLimits.MaxDispatchesPerSecond = maxDispatchesPerSecond
+	}
+
 	if queueState.GetRateLimits().GetMaxBurstSize() == 0 {
 		queueState.RateLimits.MaxBurstSize = 100
 	}
+
+	maxBurstSize, err := strconv.ParseInt(os.Getenv("MAX_BURST_SIZE"), 10, 32)
+	if err == nil && maxBurstSize != 0 {
+		queueState.RateLimits.MaxBurstSize = int32(maxBurstSize)
+	}
+
 	if queueState.GetRateLimits().GetMaxConcurrentDispatches() == 0 {
 		queueState.RateLimits.MaxConcurrentDispatches = 1000
+	}
+
+	maxConcurrentDispatches, err := strconv.ParseInt(os.Getenv("MAX_CONCURRENT_DISPATCHES"), 10, 32)
+	if err == nil && maxConcurrentDispatches != 0 {
+		queueState.RateLimits.MaxConcurrentDispatches = int32(maxConcurrentDispatches)
 	}
 
 	if queueState.GetRetryConfig() == nil {
@@ -97,17 +116,40 @@ func setInitialQueueState(queueState *tasks.Queue) {
 	if queueState.GetRetryConfig().GetMaxAttempts() == 0 {
 		queueState.RetryConfig.MaxAttempts = 100
 	}
+	maxAttempts, err := strconv.ParseInt(os.Getenv("MAX_ATTEMPTS"), 10, 32)
+	if err == nil && maxAttempts != 0 {
+		queueState.RetryConfig.MaxAttempts = int32(maxAttempts)
+	}
+
 	if queueState.GetRetryConfig().GetMaxDoublings() == 0 {
 		queueState.RetryConfig.MaxDoublings = 16
 	}
+	maxDoublings, err := strconv.ParseInt(os.Getenv("MAX_DOUBLINGS"), 10, 32)
+	if err == nil && maxDoublings != 0 {
+		queueState.RetryConfig.MaxDoublings = int32(maxDoublings)
+	}
+
 	if queueState.GetRetryConfig().GetMinBackoff() == nil {
 		queueState.RetryConfig.MinBackoff = &pduration.Duration{
 			Nanos: 100000000,
 		}
 	}
+	minBackoff, err := strconv.ParseInt(os.Getenv("MIN_BACKOFF"), 10, 32)
+	if err == nil && minBackoff != 0 {
+		queueState.RetryConfig.MinBackoff = &pduration.Duration{
+			Nanos: int32(minBackoff),
+		}
+	}
+
 	if queueState.GetRetryConfig().GetMaxBackoff() == nil {
 		queueState.RetryConfig.MaxBackoff = &pduration.Duration{
 			Seconds: 3600,
+		}
+	}
+	maxBackoff, err := strconv.ParseInt(os.Getenv("MAX_BACKOFF"), 10, 32)
+	if err == nil && maxBackoff != 0 {
+		queueState.RetryConfig.MaxBackoff = &pduration.Duration{
+			Nanos: int32(maxBackoff),
 		}
 	}
 
