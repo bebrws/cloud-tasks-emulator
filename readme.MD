@@ -174,3 +174,15 @@ createTaskRequest := taskspb.CreateTaskRequest{
 }
 createdTaskResp, _ := client.CreateTask(context.Background(), &createTaskRequest)
 ```
+
+# Queue configuration
+
+Can be done with env:
+
+MAX_DISPATCHES_PER_SECOND
+MAX_BURST_SIZE
+MAX_CONCURRENT_DISPATCHES
+MAX_ATTEMPTS
+MAX_DOUBLINGS
+MIN_BACKOFF
+MAX_BACKOFF
