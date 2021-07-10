@@ -1,4 +1,6 @@
-FROM golang:1.13-alpine as builder
+FROM debian
+
+RUN apt-get update && apt-get install -y golang bash git build-essential
 
 WORKDIR /app
 
@@ -10,13 +12,4 @@ COPY . .
 
 RUN go build -o emulator .
 
-
-FROM alpine:latest
-
-LABEL org.opencontainers.image.source=https://github.com/aertje/cloud-tasks-emulator
-
-ENTRYPOINT ["/emulator"]
-
-WORKDIR /
-
-COPY --from=builder /app/emulator .
+CMD [ "./emulator" ]
